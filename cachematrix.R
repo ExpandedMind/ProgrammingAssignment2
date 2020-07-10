@@ -1,15 +1,37 @@
 ## Put comments here that give an overall description of what your
-## functions do
+# Below functions help long matrix inverse computations  by caching result
+# of first calculated inverse of a given matrix, returning this cached result
+# next time a user asks for the inverse version of a given matrix.
 
-## Write a short comment describing this function
+## Creates a custom list object with methods to access a matrix and its inverse
+## version
 
 makeCacheMatrix <- function(x = matrix()) {
-
+    inverse_matrix <- NULL
+    getFunction <- function() x
+    setFunction <- function(new_matrix) {
+        x <<- new_matrix
+        inverse_matrix <- NULL
+    }
+    getInverseMatrix <- function() inverse_matrix
+    setInverseMatrix <- function(calculated) inverse_matrix <<- calculated
+    list(setMatrix = setFunction,
+         getMatrix = getFunction,
+         getInverse = getInverseMatrix,
+         setInverse = setInverseMatrix)
 }
 
 
-## Write a short comment describing this function
-
+# Returns inverse matrix of provided one as parameter, looking first for a 
+# cached calculation. If cache is missing, then inverse matrix calculation is
+# performed.
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+    inverse_matrix <- x$getInverse()
+    if(!is.null(inverse_matrix)) {
+        message("Using cached inverse matrix")
+        return(inverse_matrix)
+    }
+    inverse_matrix <- solve(x$getMatrix(), ...)
+    x$setInverse(inverse_matrix)
+    return(inverse_matrix)
 }
